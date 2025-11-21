@@ -1,0 +1,1786 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía Proyecto Juego del Gato - C++</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #1e1e1e;
+            --bg-secondary: #252526;
+            --bg-tertiary: #2d2d30;
+            --bg-hover: #37373d;
+            --text-primary: #cccccc;
+            --text-secondary: #858585;
+            --accent-blue: #569cd6;
+            --accent-green: #4ec9b0;
+            --accent-yellow: #dcdcaa;
+            --accent-orange: #ce9178;
+            --border-color: #3e3e42;
+            --success: #89d185;
+            --warning: #cca700;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        code, pre {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            padding: 20px;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        .sidebar h1 {
+            color: var(--accent-blue);
+            font-size: 1.3em;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .progress-section {
+            background: var(--bg-tertiary);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--bg-hover);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-green));
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .progress-text {
+            font-size: 0.9em;
+            color: var(--text-secondary);
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-menu li {
+            margin-bottom: 8px;
+        }
+
+        .nav-menu a {
+            color: var(--text-primary);
+            text-decoration: none;
+            display: block;
+            padding: 8px 12px;
+            border-radius: 4px;
+            transition: all 0.2s;
+            font-size: 0.95em;
+        }
+
+        .nav-menu a:hover {
+            background: var(--bg-hover);
+            color: var(--accent-blue);
+        }
+
+        .nav-menu a.active {
+            background: var(--bg-hover);
+            color: var(--accent-green);
+            border-left: 3px solid var(--accent-green);
+        }
+
+        .reset-btn {
+            width: 100%;
+            padding: 10px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.2s;
+        }
+
+        .reset-btn:hover {
+            background: var(--bg-hover);
+            border-color: var(--accent-orange);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 40px;
+            max-width: 1200px;
+        }
+
+        .section {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border-color);
+        }
+
+        .section h2 {
+            color: var(--accent-blue);
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .section h3 {
+            color: var(--accent-green);
+            margin: 25px 0 15px 0;
+            font-size: 1.3em;
+        }
+
+        .section h4 {
+            color: var(--accent-yellow);
+            margin: 20px 0 10px 0;
+            font-size: 1.1em;
+        }
+
+        .section ul {
+            margin-left: 20px;
+            color: var(--text-secondary);
+        }
+
+        .section ol {
+            margin-left: 20px;
+            margin-bottom: 20px;
+        }
+
+        /* Checklist */
+        .checklist-item {
+            background: var(--bg-tertiary);
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 6px;
+            border-left: 3px solid var(--accent-blue);
+            transition: all 0.2s;
+        }
+
+        .checklist-item.completed {
+            border-left-color: var(--success);
+            opacity: 0.7;
+        }
+
+        .checklist-item label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .checklist-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            cursor: pointer;
+            accent-color: var(--accent-green);
+        }
+
+        /* Code Block */
+        .code-block {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 20px;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+
+        .code-block pre {
+            margin: 0;
+            color: var(--text-primary);
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .code-block .keyword { color: var(--accent-blue); }
+        .code-block .type { color: var(--accent-green); }
+        .code-block .function { color: var(--accent-yellow); }
+        .code-block .string { color: var(--accent-orange); }
+        .code-block .comment { color: var(--text-secondary); font-style: italic; }
+
+        /* Collapsible */
+        .collapsible {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+
+        .collapsible-header {
+            padding: 15px 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.2s;
+        }
+
+        .collapsible-header:hover {
+            background: var(--bg-hover);
+        }
+
+        .collapsible-header h4 {
+            margin: 0;
+            color: var(--accent-yellow);
+        }
+
+        .collapsible-icon {
+            transition: transform 0.3s;
+        }
+
+        .collapsible.active .collapsible-icon {
+            transform: rotate(180deg);
+        }
+
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .collapsible.active .collapsible-content {
+            max-height: 2000px;
+        }
+
+        .collapsible-body {
+            padding: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* Board Simulator */
+        .board-simulator {
+            display: grid;
+            grid-template-columns: repeat(3, 80px);
+            gap: 10px;
+            margin: 20px 0;
+            justify-content: center;
+        }
+
+        .board-cell {
+            width: 80px;
+            height: 80px;
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            font-weight: bold;
+            color: var(--accent-blue);
+            cursor: pointer;
+            transition: all 0.2s;
+            border-radius: 4px;
+        }
+
+        .board-cell:hover {
+            background: var(--bg-hover);
+            border-color: var(--accent-green);
+        }
+
+        .board-cell.x {
+            color: var(--accent-blue);
+        }
+
+        .board-cell.o {
+            color: var(--accent-orange);
+        }
+
+        /* Info Box */
+        .info-box {
+            background: var(--bg-tertiary);
+            border-left: 4px solid var(--accent-blue);
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .info-box.warning {
+            border-left-color: var(--warning);
+        }
+
+        .info-box.success {
+            border-left-color: var(--success);
+        }
+
+        .info-box h5 {
+            color: var(--accent-yellow);
+            margin-bottom: 8px;
+            font-size: 1em;
+        }
+
+        .info-box ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+
+        .info-box pre {
+            margin-top: 10px;
+            color: var(--accent-green);
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .tab {
+            padding: 10px 20px;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+        }
+
+        .tab:hover {
+            color: var(--text-primary);
+        }
+
+        .tab.active {
+            color: var(--accent-green);
+            border-bottom-color: var(--accent-green);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Table */
+        .rubric-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .rubric-table th,
+        .rubric-table td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid var(--border-color);
+        }
+
+        .rubric-table th {
+            background: var(--bg-tertiary);
+            color: var(--accent-green);
+            font-weight: 600;
+        }
+
+        .rubric-table tr:hover {
+            background: var(--bg-hover);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                position: relative;
+                height: auto;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+            }
+
+            .board-simulator {
+                grid-template-columns: repeat(3, 60px);
+            }
+
+            .board-cell {
+                width: 60px;
+                height: 60px;
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <h1>🎮 Juego del Gato</h1>
+            <p style="font-size: 0.85em; color: var(--text-secondary); margin-bottom: 20px;">
+                Guía Interactiva C++
+            </p>
+
+            <div class="progress-section">
+                <strong>Progreso del Proyecto</strong>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressBar"></div>
+                </div>
+                <p class="progress-text">
+                    <span id="progressPercent">0</span>% Completado
+                    (<span id="completedTasks">0</span>/<span id="totalTasks">0</span>)
+                </p>
+            </div>
+
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="#inicio" class="nav-link active">📋 Inicio</a></li>
+                    <li><a href="#estructura" class="nav-link">🏗️ Estructura</a></li>
+                    <li><a href="#checklist" class="nav-link">✅ Checklist</a></li>
+                    <li><a href="#structs" class="nav-link">📦 Structs</a></li>
+                    <li><a href="#tablero" class="nav-link">🎯 Tablero</a></li>
+                    <li><a href="#ganador" class="nav-link">🏆 Verificar Ganador</a></li>
+                    <li><a href="#ia" class="nav-link">🤖 Inteligencia Artificial</a></li>
+                    <li><a href="#menus" class="nav-link">📱 Menús</a></li>
+                    <li><a href="#validaciones" class="nav-link">✔️ Validaciones</a></li>
+                    <li><a href="#errores" class="nav-link">⚠️ Errores Comunes</a></li>
+                    <li><a href="#rubrica" class="nav-link">📊 Rúbrica</a></li>
+                </ul>
+            </nav>
+
+            <button class="reset-btn" onclick="resetProgress()">🔄 Resetear Progreso</button>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Inicio -->
+            <section id="inicio" class="section">
+                <h2>📋 Descripción del Proyecto</h2>
+                <p>
+                    Este proyecto consiste en desarrollar el clásico <strong>Juego del Gato (Tic-Tac-Toe)</strong> 
+                    en C++ con funcionalidades avanzadas incluyendo inteligencia artificial, estadísticas y 
+                    múltiples modos de juego.
+                </p>
+
+                <h3>🎯 Objetivos de Aprendizaje</h3>
+                <ul>
+                    <li>Manejo de matrices bidimensionales</li>
+                    <li>Implementación de estructuras (structs)</li>
+                    <li>Algoritmos de inteligencia artificial básica</li>
+                    <li>Validación de entrada de usuario</li>
+                    <li>Organización de código mediante funciones</li>
+                    <li>Lógica de juegos y toma de decisiones</li>
+                </ul>
+
+                <div class="info-box success">
+                    <h5>💡 Tip Importante</h5>
+                    <p>Desarrolla el proyecto de forma incremental. No intentes completar todo de una vez. 
+                    Usa esta guía para avanzar paso a paso y marca tu progreso con los checkboxes.</p>
+                </div>
+            </section>
+
+            <!-- Estructura -->
+            <section id="estructura" class="section">
+                <h2>🏗️ Estructura del Programa</h2>
+                
+                <h3>Funciones Principales Recomendadas</h3>
+                
+                <div class="collapsible">
+                    <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                        <h4>1. Funciones del Tablero</h4>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <div class="collapsible-body">
+                            <div class="code-block">
+<pre><span class="keyword">void</span> <span class="function">inicializarTablero</span>(<span class="type">char</span> tablero[<span class="string">3</span>][<span class="string">3</span>]);
+<span class="keyword">void</span> <span class="function">mostrarTablero</span>(<span class="type">char</span> tablero[<span class="string">3</span>][<span class="string">3</span>]);
+<span class="keyword">bool</span> <span class="function">tableroLleno</span>(<span class="type">char</span> tablero[<span class="string">3</span>][<span class="string">3</span>]);</pre>
+                            </div>
+                            <p><strong>Propósito:</strong> Gestionar el tablero de juego 3x3</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                        <h4>2. Funciones de Validación</h4>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <div class="collapsible-body">
+                            <div class="code-block">
+<pre><span class="keyword">bool</span> <span class="function">movimientoValido</span>(<span class="type">char</span> tablero[<span class="string">3</span>][<span class="string">3</span>], <span class="type">int</span> fila, <span class="type">int</span> columna);
+<span class="keyword">bool</span> <span class="function">validarEntrada</span>(<span class="type">int</span>&amp; valor, <span class="type">int</span> min, <span class="type">int</span> max);</pre>
+                            </div>
+                            <p><strong>Propósito:</strong> Validar entradas del usuario y movimientos</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                        <h4>3. Funciones de Verificación</h4>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <div class="collapsible-body">
+                            <div class="code-block">
+<pre><span class="keyword">bool</span> <span class="function">verificarGanador</span>(<span class="type">char</span> tablero[<span class="string">3</span>][<span class="string">3</span>], <span class="type">char</span> simbolo);
+<span class="keyword">bool</span> <span class="function">verificarFilas</span>(<span class="type">char</span> tablero[<span class="string">3</span>][<span class="string">3</span>], <span class="type">char</span> simbolo);
+<span class="keyword">bool</span> <span class="function">verificarColumnas</span>(<span class="type">char</span> tablero[<span class="string">3</span>][<span class="string">3</span>], <span class="type">char</span> simbolo);
+<span class="keyword">bool</span> <span class="function">verificarDiagonales</span>(<span class="type">char</span> tablero[<span class="string">3</span>][<span class="string">3</span>], <span class="type">char</span> simbolo);</pre>
+                            </div>
+                            <p><strong>Propósito:</strong> Detectar condiciones de victoria</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                        <h4>4. Funciones de IA</h4>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <div class="collapsible-body">
+                            <div class="code-block">
+<pre><span class="keyword">void</span> <span class="function">movimientoIAFacil</span>(<span class="type">char</span> tablero[<span class="string">3</span>][<span class="string">3</span>]);
+<span class="keyword">void</span> <span class="function">movimientoIADificil</span>(<span class="type">char</span> tablero[<span class="string">3</span>][<span class="string">3</span>]);
+<span class="keyword">bool</span> <span class="function">intentarGanar</span>(<span class="type">char</span> tablero[<span class="string">3</span>][<span class="string">3</span>], <span class="type">char</span> simbolo);
+<span class="keyword">bool</span> <span class="function">bloquearOponente</span>(<span class="type">char</span> tablero[<span class="string">3</span>][<span class="string">3</span>], <span class="type">char</span> simbolo);</pre>
+                            </div>
+                            <p><strong>Propósito:</strong> Implementar la lógica de la computadora</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                        <h4>5. Funciones de Juego</h4>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <div class="collapsible-body">
+                            <div class="code-block">
+<pre><span class="keyword">void</span> <span class="function">jugarPartida</span>(<span class="type">Jugador</span>&amp; j1, <span class="type">Jugador</span>&amp; j2, <span class="type">Estadisticas</span>&amp; stats);
+<span class="keyword">void</span> <span class="function">modoJugadorVsJugador</span>(<span class="type">Estadisticas</span>&amp; stats);
+<span class="keyword">void</span> <span class="function">modoJugadorVsIA</span>(<span class="type">Estadisticas</span>&amp; stats, <span class="type">int</span> dificultad);</pre>
+                            </div>
+                            <p><strong>Propósito:</strong> Controlar el flujo del juego</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                        <h4>6. Funciones de Menú</h4>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <div class="collapsible-body">
+                            <div class="code-block">
+<pre><span class="keyword">void</span> <span class="function">menuPrincipal</span>();
+<span class="keyword">void</span> <span class="function">menuDificultad</span>();
+<span class="keyword">void</span> <span class="function">mostrarInstrucciones</span>();
+<span class="keyword">void</span> <span class="function">mostrarEstadisticas</span>(<span class="type">Estadisticas</span> stats);</pre>
+                            </div>
+                            <p><strong>Propósito:</strong> Navegación e interfaz de usuario</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Checklist -->
+            <section id="checklist" class="section">
+                <h2>✅ Checklist de Funcionalidades</h2>
+                <p>Marca cada elemento conforme lo completes. Tu progreso se guardará automáticamente.</p>
+
+                <h3>🎮 Sistema de Juego Base</h3>
+                <div class="checklist-item">
+                    <label>
+                        <input type="checkbox" class="task-checkbox" data-task="tablero-matriz">
+                        Implementar matriz 3x3 para el tablero
+                    </label>
+                </div>
+                <div class="checklist-item">
+                    <label>
+                        <input type="checkbox" class="task-checkbox" data-task="inicializar-tablero">
+                        Función para inicializar el tablero vacío
+                    </label>
+                </div>
+                <div class="checklist-item">
+                    <label>
+                        <input type="checkbox" class="task-checkbox" data-task="mostrar-tablero">
+                        Función para mostrar el tablero en consola
+                    </label>
+                </div>
+                <div class="checklist-item">
+                    <label>
+                        <input type="checkbox" class="task-checkbox" data-task="turnos">
+                        Sistema de turnos alternados entre jugadores
+                    </label>
+                </div>
+
+                <h3>📦 Estructuras (Structs)</h3>
+                <div class="checklist-item">
+                    <label>
+                        <input type="checkbox" class="task-checkbox" data-task="struct-jugador">
+                        Crear struct Jugador (nombre, símbolo, tipo)
+                    </label>
+                </div>
+                <div class="checklist-item">
+                    <label>
+                        <input type="checkbox" class="task-checkbox" data-task="struct-estadisticas">
+                        Crear struct Estadísticas (victorias, derrotas, empates)
+                    </label>
+                </div>
+
+                <h3>🏆 Lógica de Verificación</h3>
+                <div class="checklist-item">
+                    <label>
+                        <input type="checkbox" class="task-checkbox" data-task="verificar-filas">
+                        Verificar 3 en línea en filas
+                    </label>
+                </div>
+                <div class="checklist-item">
+                    <label>
+                        <input type="checkbox" class="task-checkbox" data-task="verificar-columnas">
+                        Verificar 3 en línea en columnas
+                    </label>
+                </div>
+                <div class="checklist-item">
+                    <label>
+                        <input type="checkbox" class="task-checkbox" data-task="verificar-diagonales">
+                        Verificar 3 en línea en diagonales
+                    </label>
+                </div>
+                <div class="checklist-item">
+                    <label>
+                        <input type="checkbox" class="task-checkbox" data-task="detectar-empate">
+                        Detectar condición de empate (tablero lleno)
+                    </label>
+                </div>
+
+                <h3>👥 Modo Jugador vs Jugador</h3>
+                <div class="checklist-item">
+                    <label>
+                        <input type="checkbox" class="task-checkbox" data-task="pvp-basico">
+                        Implementar modo 2 jugadores humanos
+                    </label>
+                </div>
+                <div class="checklist-item">
+                    <label>
+                        <input type="checkbox" class="task-checkbox" data-task="pvp-nombres">
+                        Permitir ingresar nombres de jugadores
+                    </label>
+                </div>
+
+                <h3>🤖 Inteligencia Artificial</h3>
+                <div class="checklist-item">
+                    <label>
+                        <input type="checkbox" class="task-checkbox" data-task="ia-facil">
+                        IA Fácil: Movimientos aleatorios
+                    </label>
+                </div>
+                <div class="checklist-item">
+                    <label>
+                        <input type="checkbox" class="task-checkbox" data-task="ia-ganar">
+                        IA Difícil: Intentar ganar (detectar 2 en línea)
+                    </label>
+                </div>
+                <div class="checklist-item">
+                    <label>
+                        <input type="checkbox" class="task-checkbox" data-task="ia-bloquear">
+                        IA Difícil: Bloquear al oponente
+                    </label>
+                </div>
+                <div class="checklist-item">
+                    <label>
+                        <input type="checkbox" class="task-checkbox" data-task="ia-centro">
+                        IA Difícil: Priorizar centro y esquinas
+                    </label>
+                </div>
+
+                <h3>✔️ Validaciones</h3>
+                <div class="checklist-item">
+                    <label>
+                        <input type="checkbox" class="task-checkbox" data-task="validar-rango">
+                        Validar que posición esté en rango 1-3
+                    </label>
+                </div>
+                <div class="checklist-item">
+                    <label>
+                        <input type="checkbox" class="task-checkbox" data-task="validar-ocupada">
+                        Validar que casilla no esté ocupada
+                    </label>
+                </div>
+                <div class="checklist-item">
+                    <label>
+                        <input type="checkbox" class="task-checkbox" data-task="validar-entrada">
+                        Validar entrada numérica (evitar letras)
+                    </label>
+                </div>
+
+                <h3>📱 Sistema de Menús</h3>
+                <div class="checklist-item">
+                    <label>
+                        <input type="checkbox" class="task-checkbox" data-task="menu-principal">
+                        Menú principal con opciones
+                    </label>
+                </div>
+                <div class="checklist-item">
+                    <label>
+                        <input type="checkbox" class="task-checkbox" data-task="menu-dificultad">
+                        Submenú de selección de dificultad
+                    </label>
+                </div>
+                <div class="checklist-item">
+                    <label>
+                        <input type="checkbox" class="task-checkbox" data-task="instrucciones">
+                        Pantalla de instrucciones del juego
+                    </label>
+                </div>
+
+                <h3>📊 Estadísticas</h3>
+                <div class="checklist-item">
+                    <label>
+                        <input type="checkbox" class="task-checkbox" data-task="stats-contador">
+                        Contador de victorias, derrotas y empates
+                    </label>
+                </div>
+                <div class="checklist-item">
+                    <label>
+                        <input type="checkbox" class="task-checkbox" data-task="stats-mostrar">
+                        Función para mostrar estadísticas
+                    </label>
+                </div>
+
+                <h3>🎨 Pulido Final</h3>
+                <div class="checklist-item">
+                    <label>
+                        <input type="checkbox" class="task-checkbox" data-task="limpiar-pantalla">
+                        Limpiar pantalla entre turnos
+                    </label>
+                </div>
+                <div class="checklist-item">
+                    <label>
+                        <input type="checkbox" class="task-checkbox" data-task="mensajes">
+                        Mensajes claros para el usuario
+                    </label>
+                </div>
+                <div class="checklist-item">
+                    <label>
+                        <input type="checkbox" class="task-checkbox" data-task="jugar-otra">
+                        Opción para jugar otra partida
+                    </label>
+                </div>
+            </section>
+
+            <!-- Structs -->
+            <section id="structs" class="section">
+                <h2>📦 Estructuras (Structs)</h2>
+                <p>El proyecto requiere implementar <strong>2 structs obligatorios</strong>:</p>
+
+                <h3>1️⃣ Struct Jugador</h3>
+                <div class="code-block">
+<pre><span class="keyword">struct</span> <span class="type">Jugador</span> {
+    <span class="type">string</span> nombre;      <span class="comment">// Nombre del jugador</span>
+    <span class="type">char</span> simbolo;        <span class="comment">// 'X' o 'O'</span>
+    <span class="type">bool</span> esHumano;       <span class="comment">// true si es humano, false si es IA</span>
+};</pre>
+                </div>
+
+                <div class="info-box">
+                    <h5>💡 Uso del Struct Jugador</h5>
+                    <p>Este struct te permite crear objetos jugador con toda su información encapsulada:</p>
+                </div>
+
+                <div class="code-block">
+<pre><span class="comment">// Ejemplo de uso</span>
+<span class="type">Jugador</span> jugador1;
+jugador1.nombre = <span class="string">"Ana"</span>;
+jugador1.simbolo = <span class="string">'X'</span>;
+jugador1.esHumano = <span class="keyword">true</span>;
+
+<span class="type">Jugador</span> jugador2;
+jugador2.nombre = <span class="string">"Computadora"</span>;
+jugador2.simbolo = <span class="string">'O'</span>;
+jugador2.esHumano = <span class="keyword">false</span>;</pre>
+                </div>
+
+                <h3>2️⃣ Struct Estadísticas</h3>
+                <div class="code-block">
+<pre><span class="keyword">struct</span> <span class="type">Estadisticas</span> {
+    <span class="type">int</span> victorias;       <span class="comment">// Victorias del jugador 1</span>
+    <span class="type">int</span> derrotas;        <span class="comment">// Derrotas del jugador 1</span>
+    <span class="type">int</span> empates;         <span class="comment">// Partidas empatadas</span>
+    <span class="type">int</span> partidasJugadas; <span class="comment">// Total de partidas</span>
+};</pre>
+                </div>
+
+                <div class="info-box">
+                    <h5>💡 Uso del Struct Estadísticas</h5>
+                    <p>Mantiene un registro del desempeño del jugador:</p>
+                </div>
+
+                <div class="code-block">
+<pre><span class="comment">// Inicialización</span>
+<span class="type">Estadisticas</span> stats;
+stats.victorias = <span class="string">0</span>;
+stats.derrotas = <span class="string">0</span>;
+stats.empates = <span class="string">0</span>;
+stats.partidasJugadas = <span class="string">0</span>;
+
+<span class="comment">// Actualización después de cada partida</span>
+<span class="keyword">if</span> (jugadorGano) {
+    stats.victorias++;
+} <span class="keyword">else if</span> (jugadorPerdio) {
+    stats.derrotas++;
+} <span class="keyword">else</span> {
+    stats.empates++;
+}
+stats.partidasJugadas++;</pre>
+                </div>
+
+                <h3>📋 Función para Mostrar Estadísticas</h3>
+                <div class="code-block">
+<pre><span class="keyword">void</span> <span class="function">mostrarEstadisticas</span>(<span class="type">Estadisticas</span> stats) {
+    cout << <span class="string">"\n========== ESTADÍSTICAS =========="</span> << endl;
+    cout << <span class="string">"Partidas jugadas: "</span> << stats.partidasJugadas << endl;
+    cout << <span class="string">"Victorias: "</span> << stats.victorias << endl;
+    cout << <span class="string">"Derrotas: "</span> << stats.derrotas << endl;
+    cout << <span class="string">"Empates: "</span> << stats.empates << endl;
+    
+    <span class="keyword">if</span> (stats.partidasJugadas > <span class="string">0</span>) {
+        <span class="type">float</span> porcentaje = (<span class="type">float</span>)stats.victorias / stats.partidasJugadas * <span class="string">100</span>;
+        cout << <span class="string">"Porcentaje de victorias: "</span> << porcentaje << <span class="string">"%"</span> << endl;
+    }
+    cout << <span class="string">"=================================="</span> << endl;
+}</pre>
+                </div>
+            </section>
+
+            <!-- Tablero -->
+            <section id="tablero" class="section">
+                <h2>🎯 Implementación del Tablero</h2>
+
+                <h3>Declaración de la Matriz</h3>
+                <div class="code-block">
+<pre><span class="type">char</span> tablero[<span class="string">3</span>][<span class="string">3</span>];  <span class="comment">// Matriz 3x3 de caracteres</span></pre>
+                </div>
+
+                <h3>Función: Inicializar Tablero</h3>
+                <div class="code-block">
+<pre><span class="keyword">void</span> <span class="function">inicializarTablero</span>(<span class="type">char</span> tablero[<span class="string">3</span>][<span class="string">3</span>]) {
+    <span class="comment">// Llenar todas las posiciones con espacios o números</span>
+    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="string">0</span>; i < <span class="string">3</span>; i++) {
+        <span class="keyword">for</span> (<span class="type">int</span> j = <span class="string">0</span>; j < <span class="string">3</span>; j++) {
+            tablero[i][j] = <span class="string">' '</span>;  <span class="comment">// Espacio vacío</span>
+            <span class="comment">// Alternativa: tablero[i][j] = '1' + (i*3 + j); // Números 1-9</span>
+        }
+    }
+}</pre>
+                </div>
+
+                <h3>Función: Mostrar Tablero</h3>
+                <div class="code-block">
+<pre><span class="keyword">void</span> <span class="function">mostrarTablero</span>(<span class="type">char</span> tablero[<span class="string">3</span>][<span class="string">3</span>]) {
+    cout << <span class="string">"\n"</span>;
+    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="string">0</span>; i < <span class="string">3</span>; i++) {
+        cout << <span class="string">" "</span>;
+        <span class="keyword">for</span> (<span class="type">int</span> j = <span class="string">0</span>; j < <span class="string">3</span>; j++) {
+            cout << tablero[i][j];
+            <span class="keyword">if</span> (j < <span class="string">2</span>) cout << <span class="string">" | "</span>;
+        }
+        cout << <span class="string">"\n"</span>;
+        <span class="keyword">if</span> (i < <span class="string">2</span>) cout << <span class="string">"---|---|---\n"</span>;
+    }
+    cout << <span class="string">"\n"</span>;
+}</pre>
+                </div>
+
+                <div class="info-box">
+                    <h5>📌 Salida Esperada</h5>
+                    <p>El tablero debe mostrarse así:</p>
+                    <pre>
+ X | O | X
+---|---|---
+ O | X | 
+---|---|---
+   |   | O</pre>
+                </div>
+
+                <h3>Simulador Visual del Tablero</h3>
+                <p>Haz clic en las celdas para entender cómo funcionan los índices:</p>
+                <div class="board-simulator" id="boardSimulator">
+                    <div class="board-cell" data-row="0" data-col="0" onclick="clickCell(this)">1</div>
+                    <div class="board-cell" data-row="0" data-col="1" onclick="clickCell(this)">2</div>
+                    <div class="board-cell" data-row="0" data-col="2" onclick="clickCell(this)">3</div>
+                    <div class="board-cell" data-row="1" data-col="0" onclick="clickCell(this)">4</div>
+                    <div class="board-cell" data-row="1" data-col="1" onclick="clickCell(this)">5</div>
+                    <div class="board-cell" data-row="1" data-col="2" onclick="clickCell(this)">6</div>
+                    <div class="board-cell" data-row="2" data-col="0" onclick="clickCell(this)">7</div>
+                    <div class="board-cell" data-row="2" data-col="1" onclick="clickCell(this)">8</div>
+                    <div class="board-cell" data-row="2" data-col="2" onclick="clickCell(this)">9</div>
+                </div>
+                <p style="text-align: center; color: var(--text-secondary);">
+                    <span id="cellInfo">Haz clic en una celda para ver sus índices</span>
+                </p>
+
+                <h3>Función: Tablero Lleno (Empate)</h3>
+                <div class="code-block">
+<pre><span class="keyword">bool</span> <span class="function">tableroLleno</span>(<span class="type">char</span> tablero[<span class="string">3</span>][<span class="string">3</span>]) {
+    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="string">0</span>; i < <span class="string">3</span>; i++) {
+        <span class="keyword">for</span> (<span class="type">int</span> j = <span class="string">0</span>; j < <span class="string">3</span>; j++) {
+            <span class="keyword">if</span> (tablero[i][j] == <span class="string">' '</span>) {
+                <span class="keyword">return</span> <span class="keyword">false</span>;  <span class="comment">// Hay al menos una casilla vacía</span>
+            }
+        }
+    }
+    <span class="keyword">return</span> <span class="keyword">true</span>;  <span class="comment">// Todas las casillas están ocupadas</span>
+}</pre>
+                </div>
+            </section>
+
+            <!-- Verificar Ganador -->
+            <section id="ganador" class="section">
+                <h2>🏆 Verificar Ganador</h2>
+                <p>Para ganar, un jugador debe tener 3 símbolos iguales en:</p>
+                <ul>
+                    <li>Una fila horizontal</li>
+                    <li>Una columna vertical</li>
+                    <li>Una diagonal</li>
+                </ul>
+
+                <div class="tabs">
+                    <button class="tab active" onclick="switchTab(event, 'filas')">Filas</button>
+                    <button class="tab" onclick="switchTab(event, 'columnas')">Columnas</button>
+                    <button class="tab" onclick="switchTab(event, 'diagonales')">Diagonales</button>
+                    <button class="tab" onclick="switchTab(event, 'completo')">Función Completa</button>
+                </div>
+
+                <div id="filas" class="tab-content active">
+                    <h3>Verificar Filas</h3>
+                    <div class="code-block">
+<pre><span class="keyword">bool</span> <span class="function">verificarFilas</span>(<span class="type">char</span> tablero[<span class="string">3</span>][<span class="string">3</span>], <span class="type">char</span> simbolo) {
+    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="string">0</span>; i < <span class="string">3</span>; i++) {
+        <span class="keyword">if</span> (tablero[i][<span class="string">0</span>] == simbolo && 
+            tablero[i][<span class="string">1</span>] == simbolo && 
+            tablero[i][<span class="string">2</span>] == simbolo) {
+            <span class="keyword">return</span> <span class="keyword">true</span>;  <span class="comment">// Ganó en la fila i</span>
+        }
+    }
+    <span class="keyword">return</span> <span class="keyword">false</span>;
+}</pre>
+                    </div>
+                    <p><strong>Lógica:</strong> Recorre cada fila y verifica si las 3 columnas tienen el mismo símbolo.</p>
+                </div>
+
+                <div id="columnas" class="tab-content">
+                    <h3>Verificar Columnas</h3>
+                    <div class="code-block">
+<pre><span class="keyword">bool</span> <span class="function">verificarColumnas</span>(<span class="type">char</span> tablero[<span class="string">3</span>][<span class="string">3</span>], <span class="type">char</span> simbolo) {
+    <span class="keyword">for</span> (<span class="type">int</span> j = <span class="string">0</span>; j < <span class="string">3</span>; j++) {
+        <span class="keyword">if</span> (tablero[<span class="string">0</span>][j] == simbolo && 
+            tablero[<span class="string">1</span>][j] == simbolo && 
+            tablero[<span class="string">2</span>][j] == simbolo) {
+            <span class="keyword">return</span> <span class="keyword">true</span>;  <span class="comment">// Ganó en la columna j</span>
+        }
+    }
+    <span class="keyword">return</span> <span class="keyword">false</span>;
+}</pre>
+                    </div>
+                    <p><strong>Lógica:</strong> Recorre cada columna y verifica si las 3 filas tienen el mismo símbolo.</p>
+                </div>
+
+                <div id="diagonales" class="tab-content">
+                    <h3>Verificar Diagonales</h3>
+                    <div class="code-block">
+<pre><span class="keyword">bool</span> <span class="function">verificarDiagonales</span>(<span class="type">char</span> tablero[<span class="string">3</span>][<span class="string">3</span>], <span class="type">char</span> simbolo) {
+    <span class="comment">// Diagonal principal (↘)</span>
+    <span class="keyword">if</span> (tablero[<span class="string">0</span>][<span class="string">0</span>] == simbolo && 
+        tablero[<span class="string">1</span>][<span class="string">1</span>] == simbolo && 
+        tablero[<span class="string">2</span>][<span class="string">2</span>] == simbolo) {
+        <span class="keyword">return</span> <span class="keyword">true</span>;
+    }
+    
+    <span class="comment">// Diagonal secundaria (↙)</span>
+    <span class="keyword">if</span> (tablero[<span class="string">0</span>][<span class="string">2</span>] == simbolo && 
+        tablero[<span class="string">1</span>][<span class="string">1</span>] == simbolo && 
+        tablero[<span class="string">2</span>][<span class="string">0</span>] == simbolo) {
+        <span class="keyword">return</span> <span class="keyword">true</span>;
+    }
+    
+    <span class="keyword">return</span> <span class="keyword">false</span>;
+}</pre>
+                    </div>
+                    <p><strong>Lógica:</strong> Verifica ambas diagonales del tablero.</p>
+                </div>
+
+                <div id="completo" class="tab-content">
+                    <h3>Función Verificar Ganador Completa</h3>
+                    <div class="code-block">
+<pre><span class="keyword">bool</span> <span class="function">verificarGanador</span>(<span class="type">char</span> tablero[<span class="string">3</span>][<span class="string">3</span>], <span class="type">char</span> simbolo) {
+    <span class="comment">// Usar las funciones auxiliares</span>
+    <span class="keyword">return</span> verificarFilas(tablero, simbolo) || 
+           verificarColumnas(tablero, simbolo) || 
+           verificarDiagonales(tablero, simbolo);
+}</pre>
+                    </div>
+                    <p><strong>Uso:</strong></p>
+                    <div class="code-block">
+<pre><span class="keyword">if</span> (verificarGanador(tablero, <span class="string">'X'</span>)) {
+    cout << <span class="string">"¡Jugador X ha ganado!"</span> << endl;
+} <span class="keyword">else if</span> (verificarGanador(tablero, <span class="string">'O'</span>)) {
+    cout << <span class="string">"¡Jugador O ha ganado!"</span> << endl;
+} <span class="keyword">else if</span> (tableroLleno(tablero)) {
+    cout << <span class="string">"¡Empate!"</span> << endl;
+}</pre>
+                    </div>
+                </div>
+            </section>
+
+            <!-- IA -->
+            <section id="ia" class="section">
+                <h2>🤖 Inteligencia Artificial</h2>
+
+                <h3>Nivel 1️⃣: IA Fácil (Aleatoria)</h3>
+                <p>La IA fácil simplemente elige una casilla vacía al azar.</p>
+                <div class="code-block">
+<pre><span class="keyword">#include</span> <span class="string">&lt;cstdlib&gt;</span>  <span class="comment">// Para rand()</span>
+<span class="keyword">#include</span> <span class="string">&lt;ctime&gt;</span>    <span class="comment">// Para time()</span>
+
+<span class="keyword">void</span> <span class="function">movimientoIAFacil</span>(<span class="type">char</span> tablero[<span class="string">3</span>][<span class="string">3</span>], <span class="type">char</span> simbolo) {
+    <span class="type">int</span> fila, columna;
+    
+    <span class="comment">// Buscar una casilla vacía aleatoriamente</span>
+    <span class="keyword">do</span> {
+        fila = rand() % <span class="string">3</span>;      <span class="comment">// Número aleatorio 0-2</span>
+        columna = rand() % <span class="string">3</span>;
+    } <span class="keyword">while</span> (tablero[fila][columna] != <span class="string">' '</span>);
+    
+    <span class="comment">// Colocar el símbolo</span>
+    tablero[fila][columna] = simbolo;
+    cout << <span class="string">"IA juega en: "</span> << (fila+<span class="string">1</span>) << <span class="string">","</span> << (columna+<span class="string">1</span>) << endl;
+}</pre>
+                </div>
+
+                <div class="info-box warning">
+                    <h5>⚠️ No olvides inicializar el generador aleatorio</h5>
+                    <p>En el main(), antes de usar la IA: <code>srand(time(0));</code></p>
+                </div>
+
+                <h3>Nivel 2️⃣: IA Difícil (Estratégica)</h3>
+                <p>La IA difícil sigue esta estrategia en orden de prioridad:</p>
+                <ol>
+                    <li><strong>Ganar:</strong> Si puede completar 3 en línea, lo hace</li>
+                    <li><strong>Bloquear:</strong> Si el oponente puede ganar, lo bloquea</li>
+                    <li><strong>Centro:</strong> Si está vacío, lo toma</li>
+                    <li><strong>Esquinas:</strong> Prefiere esquinas libres</li>
+                    <li><strong>Aleatorio:</strong> Si no hay mejor opción</li>
+                </ol>
+
+                <h4>Función: Intentar Ganar</h4>
+                <div class="code-block">
+<pre><span class="keyword">bool</span> <span class="function">intentarGanar</span>(<span class="type">char</span> tablero[<span class="string">3</span>][<span class="string">3</span>], <span class="type">char</span> simbolo) {
+    <span class="comment">// Verificar cada posición vacía</span>
+    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="string">0</span>; i < <span class="string">3</span>; i++) {
+        <span class="keyword">for</span> (<span class="type">int</span> j = <span class="string">0</span>; j < <span class="string">3</span>; j++) {
+            <span class="keyword">if</span> (tablero[i][j] == <span class="string">' '</span>) {
+                <span class="comment">// Probar colocar el símbolo</span>
+                tablero[i][j] = simbolo;
+                
+                <span class="comment">// ¿Ganaríamos con este movimiento?</span>
+                <span class="keyword">if</span> (verificarGanador(tablero, simbolo)) {
+                    <span class="comment">// ¡Sí! Dejarlo ahí</span>
+                    cout << <span class="string">"IA juega en: "</span> << (i+<span class="string">1</span>) << <span class="string">","</span> << (j+<span class="string">1</span>) << endl;
+                    <span class="keyword">return</span> <span class="keyword">true</span>;
+                }
+                
+                <span class="comment">// No ganaríamos, quitar el símbolo</span>
+                tablero[i][j] = <span class="string">' '</span>;
+            }
+        }
+    }
+    <span class="keyword">return</span> <span class="keyword">false</span>;  <span class="comment">// No hay movimiento ganador</span>
+}</pre>
+                </div>
+
+                <h4>Función: Bloquear Oponente</h4>
+                <div class="code-block">
+<pre><span class="keyword">bool</span> <span class="function">bloquearOponente</span>(<span class="type">char</span> tablero[<span class="string">3</span>][<span class="string">3</span>], <span class="type">char</span> simboloIA, <span class="type">char</span> simboloOponente) {
+    <span class="comment">// Verificar si el oponente puede ganar en su próximo turno</span>
+    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="string">0</span>; i < <span class="string">3</span>; i++) {
+        <span class="keyword">for</span> (<span class="type">int</span> j = <span class="string">0</span>; j < <span class="string">3</span>; j++) {
+            <span class="keyword">if</span> (tablero[i][j] == <span class="string">' '</span>) {
+                <span class="comment">// Simular movimiento del oponente</span>
+                tablero[i][j] = simboloOponente;
+                
+                <span class="comment">// ¿El oponente ganaría?</span>
+                <span class="keyword">if</span> (verificarGanador(tablero, simboloOponente)) {
+                    <span class="comment">// ¡Bloquear! Colocar nuestro símbolo</span>
+                    tablero[i][j] = simboloIA;
+                    cout << <span class="string">"IA bloquea en: "</span> << (i+<span class="string">1</span>) << <span class="string">","</span> << (j+<span class="string">1</span>) << endl;
+                    <span class="keyword">return</span> <span class="keyword">true</span>;
+                }
+                
+                <span class="comment">// Restaurar casilla vacía</span>
+                tablero[i][j] = <span class="string">' '</span>;
+            }
+        }
+    }
+    <span class="keyword">return</span> <span class="keyword">false</span>;  <span class="comment">// No hay amenaza inmediata</span>
+}</pre>
+                </div>
+
+                <h4>Función: IA Difícil Completa</h4>
+                <div class="code-block">
+<pre><span class="keyword">void</span> <span class="function">movimientoIADificil</span>(<span class="type">char</span> tablero[<span class="string">3</span>][<span class="string">3</span>], <span class="type">char</span> simboloIA, <span class="type">char</span> simboloOponente) {
+    <span class="comment">// 1. Intentar ganar</span>
+    <span class="keyword">if</span> (intentarGanar(tablero, simboloIA)) <span class="keyword">return</span>;
+    
+    <span class="comment">// 2. Bloquear al oponente</span>
+    <span class="keyword">if</span> (bloquearOponente(tablero, simboloIA, simboloOponente)) <span class="keyword">return</span>;
+    
+    <span class="comment">// 3. Tomar el centro si está vacío</span>
+    <span class="keyword">if</span> (tablero[<span class="string">1</span>][<span class="string">1</span>] == <span class="string">' '</span>) {
+        tablero[<span class="string">1</span>][<span class="string">1</span>] = simboloIA;
+        cout << <span class="string">"IA juega en centro: 2,2"</span> << endl;
+        <span class="keyword">return</span>;
+    }
+    
+    <span class="comment">// 4. Tomar una esquina vacía</span>
+    <span class="type">int</span> esquinas[<span class="string">4</span>][<span class="string">2</span>] = {{<span class="string">0</span>,<span class="string">0</span>}, {<span class="string">0</span>,<span class="string">2</span>}, {<span class="string">2</span>,<span class="string">0</span>}, {<span class="string">2</span>,<span class="string">2</span>}};
+    <span class="keyword">for</span> (<span class="type">int</span> k = <span class="string">0</span>; k < <span class="string">4</span>; k++) {
+        <span class="type">int</span> i = esquinas[k][<span class="string">0</span>];
+        <span class="type">int</span> j = esquinas[k][<span class="string">1</span>];
+        <span class="keyword">if</span> (tablero[i][j] == <span class="string">' '</span>) {
+            tablero[i][j] = simboloIA;
+            cout << <span class="string">"IA juega en esquina: "</span> << (i+<span class="string">1</span>) << <span class="string">","</span> << (j+<span class="string">1</span>) << endl;
+            <span class="keyword">return</span>;
+        }
+    }
+    
+    <span class="comment">// 5. Movimiento aleatorio (última opción)</span>
+    movimientoIAFacil(tablero, simboloIA);
+}</pre>
+                </div>
+
+                <div class="info-box success">
+                    <h5>✅ Estrategia de la IA Difícil</h5>
+                    <p>Este algoritmo hace que la IA sea muy competitiva. La clave está en el orden de prioridades: 
+                    primero ataca, luego defiende, y finalmente busca posiciones estratégicas.</p>
+                </div>
+            </section>
+
+            <!-- Menús -->
+            <section id="menus" class="section">
+                <h2>📱 Sistema de Menús</h2>
+
+                <h3>Menú Principal</h3>
+                <div class="code-block">
+<pre><span class="keyword">void</span> <span class="function">menuPrincipal</span>() {
+    <span class="type">int</span> opcion;
+    <span class="type">Estadisticas</span> stats = {<span class="string">0</span>, <span class="string">0</span>, <span class="string">0</span>, <span class="string">0</span>};
+    
+    <span class="keyword">do</span> {
+        system(<span class="string">"clear"</span>);  <span class="comment">// o "cls" en Windows</span>
+        cout << <span class="string">"\n╔════════════════════════════════════╗"</span> << endl;
+        cout << <span class="string">"║     🎮 JUEGO DEL GATO 🎮          ║"</span> << endl;
+        cout << <span class="string">"╚════════════════════════════════════╝"</span> << endl;
+        cout << <span class="string">"\n1. Jugador vs Jugador"</span> << endl;
+        cout << <span class="string">"2. Jugador vs Computadora"</span> << endl;
+        cout << <span class="string">"3. Ver Instrucciones"</span> << endl;
+        cout << <span class="string">"4. Ver Estadísticas"</span> << endl;
+        cout << <span class="string">"5. Salir"</span> << endl;
+        cout << <span class="string">"\nSelecciona una opción: "</span>;
+        cin >> opcion;
+        
+        <span class="keyword">switch</span>(opcion) {
+            <span class="keyword">case</span> <span class="string">1</span>:
+                modoJugadorVsJugador(stats);
+                <span class="keyword">break</span>;
+            <span class="keyword">case</span> <span class="string">2</span>:
+                menuDificultad(stats);
+                <span class="keyword">break</span>;
+            <span class="keyword">case</span> <span class="string">3</span>:
+                mostrarInstrucciones();
+                <span class="keyword">break</span>;
+            <span class="keyword">case</span> <span class="string">4</span>:
+                mostrarEstadisticas(stats);
+                <span class="keyword">break</span>;
+            <span class="keyword">case</span> <span class="string">5</span>:
+                cout << <span class="string">"¡Gracias por jugar!"</span> << endl;
+                <span class="keyword">break</span>;
+            <span class="keyword">default</span>:
+                cout << <span class="string">"Opción inválida"</span> << endl;
+        }
+        
+        <span class="keyword">if</span>(opcion != <span class="string">5</span>) {
+            cout << <span class="string">"\nPresiona Enter para continuar..."</span>;
+            cin.ignore();
+            cin.get();
+        }
+        
+    } <span class="keyword">while</span>(opcion != <span class="string">5</span>);
+}</pre>
+                </div>
+
+                <h3>Menú de Dificultad</h3>
+                <div class="code-block">
+<pre><span class="keyword">void</span> <span class="function">menuDificultad</span>(<span class="type">Estadisticas</span>&amp; stats) {
+    <span class="type">int</span> dificultad;
+    
+    cout << <span class="string">"\n╔════════════════════════════════════╗"</span> << endl;
+    cout << <span class="string">"║     SELECCIONA DIFICULTAD         ║"</span> << endl;
+    cout << <span class="string">"╚════════════════════════════════════╝"</span> << endl;
+    cout << <span class="string">"\n1. Fácil (IA aleatoria)"</span> << endl;
+    cout << <span class="string">"2. Difícil (IA estratégica)"</span> << endl;
+    cout << <span class="string">"3. Regresar"</span> << endl;
+    cout << <span class="string">"\nSelecciona dificultad: "</span>;
+    cin >> dificultad;
+    
+    <span class="keyword">if</span>(dificultad == <span class="string">1</span> || dificultad == <span class="string">2</span>) {
+        modoJugadorVsIA(stats, dificultad);
+    }
+}</pre>
+                </div>
+
+                <h3>Función: Mostrar Instrucciones</h3>
+                <div class="code-block">
+<pre><span class="keyword">void</span> <span class="function">mostrarInstrucciones</span>() {
+    cout << <span class="string">"\n╔════════════════════════════════════╗"</span> << endl;
+    cout << <span class="string">"║        📖 INSTRUCCIONES           ║"</span> << endl;
+    cout << <span class="string">"╚════════════════════════════════════╝"</span> << endl;
+    cout << <span class="string">"\n🎯 OBJETIVO:"</span> << endl;
+    cout << <span class="string">"   Ser el primero en formar una línea de 3"</span> << endl;
+    cout << <span class="string">"   símbolos iguales (horizontal, vertical o diagonal)"</span> << endl;
+    
+    cout << <span class="string">"\n📋 CÓMO JUGAR:"</span> << endl;
+    cout << <span class="string">"   1. El tablero tiene 9 casillas (3x3)"</span> << endl;
+    cout << <span class="string">"   2. Los jugadores se turnan para colocar su símbolo"</span> << endl;
+    cout << <span class="string">"   3. Ingresa fila y columna (1-3)"</span> << endl;
+    cout << <span class="string">"   4. Gana quien complete 3 en línea primero"</span> << endl;
+    cout << <span class="string">"   5. Si se llena el tablero sin ganador: EMPATE"</span> << endl;
+    
+    cout << <span class="string">"\n🎮 MODOS DE JUEGO:"</span> << endl;
+    cout << <span class="string">"   • Jugador vs Jugador: Dos humanos"</span> << endl;
+    cout << <span class="string">"   • Jugador vs IA Fácil: Computadora aleatoria"</span> << endl;
+    cout << <span class="string">"   • Jugador vs IA Difícil: Computadora inteligente"</span> << endl;
+}</pre>
+                </div>
+            </section>
+
+            <!-- Validaciones -->
+            <section id="validaciones" class="section">
+                <h2>✔️ Validaciones de Entrada</h2>
+                <p>Es crucial validar todas las entradas del usuario para evitar errores.</p>
+
+                <h3>1. Validar Entrada Numérica</h3>
+                <div class="code-block">
+<pre><span class="keyword">bool</span> <span class="function">validarEntradaNumerica</span>(<span class="type">int</span>&amp; valor) {
+    <span class="keyword">if</span>(cin.fail()) {
+        cin.clear();  <span class="comment">// Limpiar el estado de error</span>
+        cin.ignore(<span class="string">10000</span>, <span class="string">'\n'</span>);  <span class="comment">// Descartar entrada inválida</span>
+        cout << <span class="string">"❌ Error: Debes ingresar un número"</span> << endl;
+        <span class="keyword">return</span> <span class="keyword">false</span>;
+    }
+    <span class="keyword">return</span> <span class="keyword">true</span>;
+}</pre>
+                </div>
+
+                <h3>2. Validar Rango</h3>
+                <div class="code-block">
+<pre><span class="keyword">bool</span> <span class="function">validarRango</span>(<span class="type">int</span> valor, <span class="type">int</span> min, <span class="type">int</span> max) {
+    <span class="keyword">if</span>(valor < min || valor > max) {
+        cout << <span class="string">"❌ Error: El valor debe estar entre "</span> 
+             << min << <span class="string">" y "</span> << max << endl;
+        <span class="keyword">return</span> <span class="keyword">false</span>;
+    }
+    <span class="keyword">return</span> <span class="keyword">true</span>;
+}</pre>
+                </div>
+
+                <h3>3. Validar Movimiento</h3>
+                <div class="code-block">
+<pre><span class="keyword">bool</span> <span class="function">movimientoValido</span>(<span class="type">char</span> tablero[<span class="string">3</span>][<span class="string">3</span>], <span class="type">int</span> fila, <span class="type">int</span> columna) {
+    <span class="comment">// Verificar que esté en rango (0-2 en índices)</span>
+    <span class="keyword">if</span>(fila < <span class="string">0</span> || fila > <span class="string">2</span> || columna < <span class="string">0</span> || columna > <span class="string">2</span>) {
+        cout << <span class="string">"❌ Error: Posición fuera del tablero"</span> << endl;
+        <span class="keyword">return</span> <span class="keyword">false</span>;
+    }
+    
+    <span class="comment">// Verificar que la casilla esté vacía</span>
+    <span class="keyword">if</span>(tablero[fila][columna] != <span class="string">' '</span>) {
+        cout << <span class="string">"❌ Error: Casilla ocupada. Intenta otra"</span> << endl;
+        <span class="keyword">return</span> <span class="keyword">false</span>;
+    }
+    
+    <span class="keyword">return</span> <span class="keyword">true</span>;
+}</pre>
+                </div>
+
+                <h3>4. Función Completa para Obtener Movimiento</h3>
+                <div class="code-block">
+<pre><span class="keyword">void</span> <span class="function">obtenerMovimientoJugador</span>(<span class="type">char</span> tablero[<span class="string">3</span>][<span class="string">3</span>], <span class="type">Jugador</span> jugador) {
+    <span class="type">int</span> fila, columna;
+    <span class="type">bool</span> movimientoOK = <span class="keyword">false</span>;
+    
+    <span class="keyword">while</span>(!movimientoOK) {
+        cout << <span class="string">"\n"</span> << jugador.nombre << <span class="string">" ("</span> << jugador.simbolo << <span class="string">"), tu turno"</span> << endl;
+        
+        <span class="comment">// Pedir fila</span>
+        cout << <span class="string">"Ingresa fila (1-3): "</span>;
+        cin >> fila;
+        <span class="keyword">if</span>(!validarEntradaNumerica(fila)) <span class="keyword">continue</span>;
+        <span class="keyword">if</span>(!validarRango(fila, <span class="string">1</span>, <span class="string">3</span>)) <span class="keyword">continue</span>;
+        
+        <span class="comment">// Pedir columna</span>
+        cout << <span class="string">"Ingresa columna (1-3): "</span>;
+        cin >> columna;
+        <span class="keyword">if</span>(!validarEntradaNumerica(columna)) <span class="keyword">continue</span>;
+        <span class="keyword">if</span>(!validarRango(columna, <span class="string">1</span>, <span class="string">3</span>)) <span class="keyword">continue</span>;
+        
+        <span class="comment">// Convertir de 1-3 a índices 0-2</span>
+        fila--;
+        columna--;
+        
+        <span class="comment">// Validar movimiento</span>
+        <span class="keyword">if</span>(movimientoValido(tablero, fila, columna)) {
+            tablero[fila][columna] = jugador.simbolo;
+            movimientoOK = <span class="keyword">true</span>;
+        }
+    }
+}</pre>
+                </div>
+
+                <div class="info-box warning">
+                    <h5>⚠️ Importante</h5>
+                    <p>Los usuarios ingresan números del 1 al 3, pero los índices de la matriz van de 0 a 2. 
+                    ¡No olvides restar 1 al convertir!</p>
+                </div>
+            </section>
+
+            <!-- Errores Comunes -->
+            <section id="errores" class="section">
+                <h2>⚠️ Errores Comunes y Soluciones</h2>
+
+                <div class="collapsible">
+                    <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                        <h4>❌ Error: Índices fuera de rango</h4>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <div class="collapsible-body">
+                            <p><strong>Problema:</strong> Intentar acceder a <code>tablero[3][3]</code> cuando los índices válidos son 0-2.</p>
+                            <p><strong>Solución:</strong></p>
+                            <div class="code-block">
+<pre><span class="comment">// ❌ Incorrecto</span>
+<span class="keyword">for</span>(<span class="type">int</span> i = <span class="string">1</span>; i <= <span class="string">3</span>; i++) {
+    tablero[i][i] = <span class="string">'X'</span>;  <span class="comment">// Error cuando i=3</span>
+}
+
+<span class="comment">// ✅ Correcto</span>
+<span class="keyword">for</span>(<span class="type">int</span> i = <span class="string">0</span>; i < <span class="string">3</span>; i++) {
+    tablero[i][i] = <span class="string">'X'</span>;
+}</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                        <h4>❌ Error: No limpiar el buffer de entrada</h4>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <div class="collapsible-body">
+                            <p><strong>Problema:</strong> <code>cin.get()</code> no espera después de <code>cin >> opcion</code></p>
+                            <p><strong>Solución:</strong></p>
+                            <div class="code-block">
+<pre>cin >> opcion;
+cin.ignore();  <span class="comment">// Limpiar el '\n' que quedó en el buffer</span>
+cin.get();     <span class="comment">// Ahora sí espera Enter</span></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                        <h4>❌ Error: No inicializar srand()</h4>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <div class="collapsible-body">
+                            <p><strong>Problema:</strong> La IA siempre hace los mismos movimientos "aleatorios"</p>
+                            <p><strong>Solución:</strong></p>
+                            <div class="code-block">
+<pre><span class="keyword">int</span> <span class="function">main</span>() {
+    srand(time(<span class="string">0</span>));  <span class="comment">// ¡Importante! Inicializar generador aleatorio</span>
+    menuPrincipal();
+    <span class="keyword">return</span> <span class="string">0</span>;
+}</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                        <h4>❌ Error: Verificar ganador solo al final</h4>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <div class="collapsible-body">
+                            <p><strong>Problema:</strong> El juego continúa después de que alguien ganó</p>
+                            <p><strong>Solución:</strong> Verificar después de cada movimiento:</p>
+                            <div class="code-block">
+<pre><span class="keyword">while</span>(!juegoTerminado) {
+    <span class="comment">// Turno del jugador</span>
+    obtenerMovimiento(tablero, jugadorActual);
+    mostrarTablero(tablero);
+    
+    <span class="comment">// ✅ Verificar inmediatamente</span>
+    <span class="keyword">if</span>(verificarGanador(tablero, jugadorActual.simbolo)) {
+        cout << jugadorActual.nombre << <span class="string">" ¡ha ganado!"</span> << endl;
+        juegoTerminado = <span class="keyword">true</span>;
+        <span class="keyword">break</span>;
+    }
+    
+    <span class="keyword">if</span>(tableroLleno(tablero)) {
+        cout << <span class="string">"¡Empate!"</span> << endl;
+        juegoTerminado = <span class="keyword">true</span>;
+        <span class="keyword">break</span>;
+    }
+    
+    <span class="comment">// Cambiar turno</span>
+    cambiarTurno(jugadorActual);
+}</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                        <h4>❌ Error: Olvidar pasar structs por referencia</h4>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <div class="collapsible-body">
+                            <p><strong>Problema:</strong> Las estadísticas no se actualizan</p>
+                            <p><strong>Solución:</strong></p>
+                            <div class="code-block">
+<pre><span class="comment">// ❌ Incorrecto - Crea una copia</span>
+<span class="keyword">void</span> <span class="function">actualizarStats</span>(<span class="type">Estadisticas</span> stats) {
+    stats.victorias++;  <span class="comment">// Solo cambia la copia</span>
+}
+
+<span class="comment">// ✅ Correcto - Modifica el original</span>
+<span class="keyword">void</span> <span class="function">actualizarStats</span>(<span class="type">Estadisticas</span>&amp; stats) {
+    stats.victorias++;  <span class="comment">// Cambia el original</span>
+}</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                        <h4>❌ Error: Loops infinitos en IA</h4>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <div class="collapsible-body">
+                            <p><strong>Problema:</strong> La IA se queda buscando casilla vacía cuando no hay</p>
+                            <p><strong>Solución:</strong></p>
+                            <div class="code-block">
+<pre><span class="comment">// ✅ Agregar límite de intentos</span>
+<span class="keyword">void</span> <span class="function">movimientoIAFacil</span>(<span class="type">char</span> tablero[<span class="string">3</span>][<span class="string">3</span>], <span class="type">char</span> simbolo) {
+    <span class="type">int</span> intentos = <span class="string">0</span>;
+    <span class="type">int</span> fila, columna;
+    
+    <span class="keyword">do</span> {
+        fila = rand() % <span class="string">3</span>;
+        columna = rand() % <span class="string">3</span>;
+        intentos++;
+        
+        <span class="keyword">if</span>(intentos > <span class="string">100</span>) <span class="keyword">break</span>;  <span class="comment">// Seguridad</span>
+        
+    } <span class="keyword">while</span>(tablero[fila][columna] != <span class="string">' '</span>);
+    
+    <span class="keyword">if</span>(tablero[fila][columna] == <span class="string">' '</span>) {
+        tablero[fila][columna] = simbolo;
+    }
+}</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Rúbrica -->
+            <section id="rubrica" class="section">
+                <h2>📊 Rúbrica del Proyecto (20 puntos)</h2>
+
+                <table class="rubric-table">
+                    <thead>
+                        <tr>
+                            <th>Criterio</th>
+                            <th>Puntos</th>
+                            <th>Descripción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Tablero 3x3</strong></td>
+                            <td>2</td>
+                            <td>Matriz correctamente implementada y mostrada</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Structs</strong></td>
+                            <td>3</td>
+                            <td>2 structs obligatorios (Jugador y Estadísticas) correctamente implementados</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Verificar Ganador</strong></td>
+                            <td>3</td>
+                            <td>Detecta correctamente filas, columnas y diagonales</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Modo PvP</strong></td>
+                            <td>2</td>
+                            <td>Modo jugador vs jugador funcional</td>
+                        </tr>
+                        <tr>
+                            <td><strong>IA Fácil</strong></td>
+                            <td>2</td>
+                            <td>Movimientos aleatorios válidos</td>
+                        </tr>
+                        <tr>
+                            <td><strong>IA Difícil</strong></td>
+                            <td>3</td>
+                            <td>Algoritmo estratégico (ganar, bloquear, centro, esquinas)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Validaciones</strong></td>
+                            <td>2</td>
+                            <td>Validación de entradas y movimientos</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Menús y UX</strong></td>
+                            <td>2</td>
+                            <td>Sistema de menús, instrucciones y estadísticas</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Código Limpio</strong></td>
+                            <td>1</td>
+                            <td>Organización, comentarios y nombres descriptivos</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="info-box success" style="margin-top: 20px;">
+                    <h5>🎯 Tips para Máxima Calificación</h5>
+                    <ul>
+                        <li>✅ Comenta tu código de forma clara</li>
+                        <li>✅ Usa nombres de variables descriptivos</li>
+                        <li>✅ Organiza tu código con funciones bien definidas</li>
+                        <li>✅ Prueba todos los casos (victoria, empate, validaciones)</li>
+                        <li>✅ Asegúrate que la IA difícil realmente sea desafiante</li>
+                        <li>✅ Verifica que no haya bugs ni crashes</li>
+                    </ul>
+                </div>
+
+                <div class="info-box warning" style="margin-top: 20px;">
+                    <h5>⚠️ Requisitos Obligatorios</h5>
+                    <ul>
+                        <li>❗ Matriz 3x3 para el tablero</li>
+                        <li>❗ 2 structs (Jugador y Estadísticas)</li>
+                        <li>❗ Ambos modos de juego (PvP y PvIA)</li>
+                        <li>❗ Ambas dificultades de IA (fácil y difícil)</li>
+                        <li>❗ Sistema de menús funcional</li>
+                        <li>❗ Validaciones de entrada</li>
+                    </ul>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        // Sistema de progreso
+        let tasks = document.querySelectorAll('.task-checkbox');
+        let currentPlayer = 'X';
+
+        // Cargar progreso guardado
+        function loadProgress() {
+            tasks.forEach(task => {
+                let taskId = task.dataset.task;
+                let saved = localStorage.getItem('task_' + taskId);
+                if (saved === 'true') {
+                    task.checked = true;
+                    task.closest('.checklist-item').classList.add('completed');
+                }
+            });
+            updateProgress();
+        }
+
+        // Guardar y actualizar progreso
+        tasks.forEach(task => {
+            task.addEventListener('change', function() {
+                let taskId = this.dataset.task;
+                localStorage.setItem('task_' + taskId, this.checked);
+                
+                if (this.checked) {
+                    this.closest('.checklist-item').classList.add('completed');
+                } else {
+                    this.closest('.checklist-item').classList.remove('completed');
+                }
+                
+                updateProgress();
+            });
+        });
+
+        function updateProgress() {
+            let completed = document.querySelectorAll('.task-checkbox:checked').length;
+            let total = tasks.length;
+            let percent = Math.round((completed / total) * 100);
+            
+            document.getElementById('progressBar').style.width = percent + '%';
+            document.getElementById('progressPercent').textContent = percent;
+            document.getElementById('completedTasks').textContent = completed;
+            document.getElementById('totalTasks').textContent = total;
+        }
+
+        function resetProgress() {
+            if (confirm('¿Estás seguro de que deseas resetear todo el progreso?')) {
+                tasks.forEach(task => {
+                    task.checked = false;
+                    task.closest('.checklist-item').classList.remove('completed');
+                    localStorage.removeItem('task_' + task.dataset.task);
+                });
+                updateProgress();
+            }
+        }
+
+        // Navegación
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Remover active de todos
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                
+                // Agregar active al clickeado
+                this.classList.add('active');
+                
+                // Scroll a la sección
+                let target = this.getAttribute('href');
+                document.querySelector(target).scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+
+        // Collapsibles
+        function toggleCollapsible(header) {
+            let collapsible = header.parentElement;
+            collapsible.classList.toggle('active');
+        }
+
+        // Tabs
+        function switchTab(event, tabName) {
+            // Ocultar todos los contenidos
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Desactivar todos los tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Activar el tab y contenido seleccionado
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Simulador de tablero
+        function clickCell(cell) {
+            let row = cell.dataset.row;
+            let col = cell.dataset.col;
+            
+            if (cell.textContent === 'X' || cell.textContent === 'O') {
+                // Reset
+                cell.textContent = (parseInt(row) * 3 + parseInt(col) + 1);
+                cell.classList.remove('x', 'o');
+            } else {
+                // Colocar símbolo
+                cell.textContent = currentPlayer;
+                cell.classList.add(currentPlayer.toLowerCase());
+                currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+            }
+            
+            document.getElementById('cellInfo').textContent = 
+                `Celda: tablero[${row}][${col}] - Índices de matriz (0-2)`;
+        }
+
+        // Inicializar al cargar
+        window.addEventListener('load', function() {
+            loadProgress();
+            
+            // Observar scroll para actualizar navegación activa
+            let sections = document.querySelectorAll('.section');
+            
+            window.addEventListener('scroll', function() {
+                let current = '';
+                
+                sections.forEach(section => {
+                    let sectionTop = section.offsetTop;
+                    if (pageYOffset >= sectionTop - 100) {
+                        current = section.getAttribute('id');
+                    }
+                });
+                
+                document.querySelectorAll('.nav-link').forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === '#' + current) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
